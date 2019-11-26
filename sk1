@@ -1,11 +1,11 @@
 .MODEL small
 .STACK 200h
 .DATA
-Buffer DB 6, ?, 6 dup (?)
-A DW ?
-B DW ?
-C DW ?
-Str1 DB 6 dup (?)
+Buffer DB 6, ?, 6 dup (?) 
+A DW 0
+B DW 0
+C DW 0
+Str1 DB 5 dup (?)
 .CODE
 ProgramStart:   
     mov AX, @DATA
@@ -15,24 +15,22 @@ ProgramStart:
     mov DX, offset Buffer
     int 21h
     
- mov CL, Buffer[1]
- mov SI, 2
- 
-LoopStart:
+    mov CL, Buffer[1]
+    mov SI, 2
 
- mov AL, 10
- mul A
- mov A, AX
- mov BL, Buffer[SI]
- add A, BX
- sub A, 48
-
- add SI, 1
- sub CL, 1
-
- cmp CL, 0 
- jne LoopStart;
-   mov CX, A
+    LoopStart:  ;A
+    mov AH, 0
+    mov AL, 10
+    mul A
+    mov A, AX
+    mov BL, Buffer[SI]
+    add A, BX
+    sub A, 48
+    add SI, 1
+    sub CL, 1
+    cmp CL, 0 
+jne LoopStart
+    
     
     
     mov AH, 0Fh ;Clear
@@ -44,45 +42,58 @@ LoopStart:
     mov DX, offset Buffer
     int 21h
     
- mov CL, Buffer[1]
- mov SI, 2
- 
-LoopStart1:
+    mov CL, Buffer[1]
+    mov SI, 2
+LoopStart1:     ;B
+    mov AH, 0
+    mov AL, 10
+    mul B
+    mov B, AX
+    mov BL, Buffer[SI]
+    add B, BX
+    sub B, 48
 
- mov AL, 10
- mul B
- mov B, AX
- mov BL, Buffer[SI]
- add B, BX
- sub B, 48
+    add SI, 1
+    sub CL, 1
 
- add SI, 1
- sub CL, 1
-
- cmp CL, 0 
- jne LoopStart1
- mov CX, B
+    cmp CL, 0 
+jne LoopStart1
+    
  
     fild A
     fild B
     fadd 
     fistp C
+    
+     mov AX, C
+     mov CL, 0
+     
+Loop3:
+     mov BX, 10
+     div BX
+     add CL, 1
+     
+     
+     mov DX, 0
+     cmp AX, 0
+jne Loop3
  
-    mov BL, CL ; to BX
+    mov BL, CL ;  to BX
     mov BH, 0
     mov AX, C
     mov SI, BX
     mov str1[SI], '$'
+    
 String:
-    sub SI, 1
-    mov AH, 0
-    mov BH, 10
-    div BH
-    mov BH, AH
-    add BH, 48
-    mov str1[SI], BH
-    cmp AL, 0
-    jne String
+     sub SI, 1
+     mov DX, 0
+     mov BX, 10
+     div BX
+     mov BH, DL
+     add BH, 48
+     mov str1[SI], BH
+     cmp AX, 0
+jne String
     
     mov DL, 10
     mov AH, 02h
