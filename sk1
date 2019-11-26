@@ -1,11 +1,11 @@
 .MODEL small
 .STACK 200h
 .DATA
-Buffer DW 255, ?, 255 dup (?)
+Buffer DB 6, ?, 6 dup (?)
 A DW ?
 B DW ?
 C DW ?
-Str1 DB 5 dup (?)
+Str1 DB 6 dup (?)
 .CODE
 ProgramStart:   
     mov AX, @DATA
@@ -15,13 +15,25 @@ ProgramStart:
     mov DX, offset Buffer
     int 21h
     
-    mov AX, Buffer[2]   ;A
-    sub AX, 48  ;-
-    mov BH, 10
-    mul BH      ;*
-    mov AX, Buffer[3]
-    sub AX, 48  ;-
-    mov A, AX
+ mov CL, Buffer[1]
+ mov SI, 2
+ 
+LoopStart:
+
+ mov AL, 10
+ mul A
+ mov A, AX
+ mov BL, Buffer[SI]
+ add A, BX
+ sub A, 48
+
+ add SI, 1
+ sub CL, 1
+
+ cmp CL, 0 
+ jne LoopStart;
+   mov CX, A
+    
     
     mov AH, 0Fh ;Clear
     int 10h
@@ -32,19 +44,30 @@ ProgramStart:
     mov DX, offset Buffer
     int 21h
     
-    mov AX, Buffer[2]   ;B
-    sub AX, 48  ;-
-    mov BH, 10
-    mul BH      ;*
-    mov AX, Buffer[3]
-    sub AX, 48  ;-
-    mov B, AX
+ mov CL, Buffer[1]
+ mov SI, 2
+ 
+LoopStart1:
+
+ mov AL, 10
+ mul B
+ mov B, AX
+ mov BL, Buffer[SI]
+ add B, BX
+ sub B, 48
+
+ add SI, 1
+ sub CL, 1
+
+ cmp CL, 0 
+ jne LoopStart1
+ mov CX, B
  
     fild A
     fild B
     fadd 
     fistp C
-    
+ 
     mov BL, CL ; to BX
     mov BH, 0
     mov AX, C
@@ -74,4 +97,4 @@ String:
                 
     mov AH, 4Ch
     int 21h
-end ProgramStart
+end ProgramStart 
