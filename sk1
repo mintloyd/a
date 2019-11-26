@@ -1,0 +1,77 @@
+.MODEL small
+.STACK 200h
+.DATA
+Buffer DW 255, ?, 255 dup (?)
+A DW ?
+B DW ?
+C DW ?
+Str1 DB 5 dup (?)
+.CODE
+ProgramStart:   
+    mov AX, @DATA
+    mov DS, AX
+    
+    mov AH, 0Ah ;Piepras?t Astr
+    mov DX, offset Buffer
+    int 21h
+    
+    mov AX, Buffer[2]   ;A
+    sub AX, 48  ;-
+    mov BH, 10
+    mul BH      ;*
+    mov AX, Buffer[3]
+    sub AX, 48  ;-
+    mov A, AX
+    
+    mov AH, 0Fh ;Clear
+    int 10h
+    mov AH, 0
+    int 10h
+    
+    mov AH, 0Ah ;Piepras?t Bstr
+    mov DX, offset Buffer
+    int 21h
+    
+    mov AX, Buffer[2]   ;B
+    sub AX, 48  ;-
+    mov BH, 10
+    mul BH      ;*
+    mov AX, Buffer[3]
+    sub AX, 48  ;-
+    mov B, AX
+ 
+    fild A
+    fild B
+    fadd 
+    fistp C
+    
+    mov BL, CL ; to BX
+    mov BH, 0
+    mov AX, C
+    mov SI, BX
+    mov str1[SI], '$'
+String:
+    sub SI, 1
+    mov AH, 0
+    mov BH, 10
+    div BH
+    mov BH, AH
+    add BH, 48
+    mov str1[SI], BH
+    cmp AL, 0
+    jne String
+    
+    mov DL, 10
+    mov AH, 02h
+    int 21h
+    
+    mov AH, 9 ; Output
+    mov DX, offset str1
+    int 21h
+    
+    mov AH, 0
+    int 16h
+                
+    mov AH, 4Ch
+    int 21h
+end ProgramStart
